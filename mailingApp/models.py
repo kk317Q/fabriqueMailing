@@ -11,8 +11,8 @@ class Mailing(models.Model):
     targetClient_Tag = models.CharField(max_length = 200)
 
 class Client(models.Model):
-    phoneNumber = models.DateTimeField()
-    phoneCode = models.DateTimeField()
+    phoneNumber2 = models.IntegerField(default=0)
+    phoneCode2 = models.IntegerField(default=999)
     tag = models.CharField(max_length = 100)
     timeZone = models.IntegerField()
 
