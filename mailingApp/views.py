@@ -1,9 +1,112 @@
 from django.shortcuts import render
+from rest_framework import generics, viewsets
 from rest_framework.views import APIView  
 from rest_framework.response import Response
-from .models import Client
-from .serializers import ClientSerializer
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.decorators import action
+from .serializers import ClientSerializer, MailingSerializer, MessageSerializer
+import datetime
+from django.utils import timezone
+from .tasks import mailingProcess, printEr
+from .models import Client, Mailing, Message
+import json
 
+
+class ClientViewSet(viewsets.ModelViewSet):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+
+class MailingViewSet(viewsets.ModelViewSet):
+    queryset = Mailing.objects.all()
+    serializer_class = MailingSerializer
+
+class MessageViewSet(viewsets.ModelViewSet):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+
+    @action(detail=True, methods=['GET'], name='Get Messages for Mailing')
+    def retrieveMessagesForMailing(self, request, *args, **kwargs):
+        varContainer = []
+        
+        print(kwargs['pk'])
+        for message in Message.objects.filter(targetMailing = kwargs['pk']):
+            varContainer.append(
+                {
+                    "messageID": message.pk,
+                    "Created on:": str(message.creationDateTime),
+                    "Status": message.status,
+                    "Target Client ID": message.targetClient.id,
+                    "for Mailing ID": message.targetMailing.id
+
+                }
+            )
+        #annotate(numberOfMessageSent=Count('message'))
+        print(json.dumps(varContainer))
+        return Response(varContainer)
+
+def mailingsStatisticsOverall():
+    varContainer = []
+    for mailing in Mailing.objects.all():
+        varContainer.append(
+            {
+                "mailingID": mailing.pk,
+                "number of Messages": mailing.message_set.count(),
+                "number of Messages Status 200": mailing.message_set.filter(status = '200').count(),
+                "number of Messages Status 400": mailing.message_set.filter(status = '400').count()
+
+
+            }
+        )
+    #annotate(numberOfMessageSent=Count('message'))
+    print(json.dumps(varContainer))
+    return Response(json.dumps(varContainer))
+
+'''def mailingsStatisticsSpecific(request, mailingID):
+    varContainer = []
+    for message in Message.objects.filter(targetMailing = mailingID):
+        varContainer.append(
+            {
+                "messageID": message.pk,
+                "Created on:": str(message.creationDateTime),
+                "Status": message.status,
+                "Target Client ID": str(message.targetClient),
+                "for Mailing ID": str(message.targetMailing)
+
+
+            }
+        )
+    #annotate(numberOfMessageSent=Count('message'))
+    print(json.dumps(varContainer))
+
+    return Response(json.dumps(varContainer))'''
+
+
+
+def runMailing(mailingID):
+    mailing = Mailing.objects.get(pk = mailingID)
+    print(mailing.startDateTime)
+    print(timezone.now())
+    print("Seconds dif: " + str((mailing.startDateTime-timezone.now()).total_seconds()))
+    if mailing.startDateTime < timezone.now():
+        mailingProcess.apply_async((mailingID,), countdown = (mailing.startDateTime-timezone.now()).total_seconds())
+
+#eta=mailing.startDateTime
+runMailing(5)
+printEr.delay()
+mailingsStatisticsOverall()
+
+
+"""class ClientAPIComplete(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+
+class ClientAPIListCreate(generics.ListCreateAPIView):
+    queryset = Client.objcts.all()
+    serializer_class = ClientSerializer
+
+class ClientAPIUpdate(generics.UpdateAPIView):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
 
 class ClientAPIView(APIView):
     def get(self, request):
@@ -53,3 +156,4 @@ class ClientAPIView(APIView):
         clientToDelete.delete()
 
         return Response({"Result": "Client was deleted"})
+"""
