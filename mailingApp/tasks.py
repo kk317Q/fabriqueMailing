@@ -3,7 +3,7 @@ from mailingApp.models import Mailing, Client, Message
 from django.utils import timezone
 import requests
 import json
-
+import time
 
 @celery_app.task
 def printEr():
@@ -13,7 +13,7 @@ def printEr():
 def mailingProcess(mailingID):
     mailing = Mailing.objects.get(pk = mailingID)
     receiversList =Client.objects.filter(phoneCode2 = mailing.targetClient_PhoneCode) | Client.objects.filter(tag = mailing.targetClient_Tag)
- 
+    #time.sleep(1)
     #print(responseContentFromSwagger)
     for client in receiversList:
             print("Sending message " + mailing.messageText + " to client " + str(client.phoneNumber2))
@@ -39,7 +39,7 @@ def mailingProcess(mailingID):
                 responseContentFromSwagger = responseFromSwagger.content
                 newMessage.status = responseFromSwagger.status_code
             except Exception as e:
-                print("Errora date: " + str(timezone.now()))
+                print("Error date: " + str(timezone.now()))
                 print(str(e) + " error raised while sending message ID: " + str(newMessage.pk) + " through external API")
                 self.retry(countdown=120)
 

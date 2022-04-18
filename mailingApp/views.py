@@ -12,13 +12,40 @@ from .models import Client, Mailing, Message
 import json
 
 
+
+
 class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
 
 class MailingViewSet(viewsets.ModelViewSet):
+    print("I come here")
+
     queryset = Mailing.objects.all()
     serializer_class = MailingSerializer
+   
+    
+    def create(self, request):
+        responseToReturn = super().create(request)
+        print(responseToReturn.data['id'])
+        newMailing = Mailing.objects.get(pk = responseToReturn.data['id'])
+        mailingProcess.apply_async((newMailing.pk,), countdown = (newMailing.startDateTime-timezone.now()).total_seconds(), expires = (newMailing.endDateTime-timezone.now()).total_seconds())
+
+        return responseToReturn
+
+    @action(detail=False, methods=['GET'], name='Get Mailings Statistics')
+    def mailingsStatisticsOverall(self, request):
+        varContainer = []
+        for mailing in Mailing.objects.all():
+            varContainer.append(
+                {
+                    "mailingID": mailing.pk,
+                    "number of Messages": mailing.message_set.count(),
+                    "number of Messages Status 200": mailing.message_set.filter(status = '200').count(),
+                    "number of Messages Status 400": mailing.message_set.filter(status = '400').count()
+                }
+            )
+        return Response(varContainer)
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
@@ -27,8 +54,6 @@ class MessageViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['GET'], name='Get Messages for Mailing')
     def retrieveMessagesForMailing(self, request, *args, **kwargs):
         varContainer = []
-        
-        print(kwargs['pk'])
         for message in Message.objects.filter(targetMailing = kwargs['pk']):
             varContainer.append(
                 {
@@ -37,29 +62,10 @@ class MessageViewSet(viewsets.ModelViewSet):
                     "Status": message.status,
                     "Target Client ID": message.targetClient.id,
                     "for Mailing ID": message.targetMailing.id
-
                 }
             )
-        #annotate(numberOfMessageSent=Count('message'))
-        print(json.dumps(varContainer))
         return Response(varContainer)
 
-def mailingsStatisticsOverall():
-    varContainer = []
-    for mailing in Mailing.objects.all():
-        varContainer.append(
-            {
-                "mailingID": mailing.pk,
-                "number of Messages": mailing.message_set.count(),
-                "number of Messages Status 200": mailing.message_set.filter(status = '200').count(),
-                "number of Messages Status 400": mailing.message_set.filter(status = '400').count()
-
-
-            }
-        )
-    #annotate(numberOfMessageSent=Count('message'))
-    print(json.dumps(varContainer))
-    return Response(json.dumps(varContainer))
 
 '''def mailingsStatisticsSpecific(request, mailingID):
     varContainer = []
@@ -82,18 +88,18 @@ def mailingsStatisticsOverall():
 
 
 
-def runMailing(mailingID):
+'''def runMailing(mailingID):
     mailing = Mailing.objects.get(pk = mailingID)
     print(mailing.startDateTime)
     print(timezone.now())
     print("Seconds dif: " + str((mailing.startDateTime-timezone.now()).total_seconds()))
     if mailing.startDateTime < timezone.now():
         mailingProcess.apply_async((mailingID,), countdown = (mailing.startDateTime-timezone.now()).total_seconds())
+    '''
 
 #eta=mailing.startDateTime
-runMailing(5)
+#runMailing(5)
 printEr.delay()
-mailingsStatisticsOverall()
 
 
 """class ClientAPIComplete(generics.RetrieveUpdateDestroyAPIView):
