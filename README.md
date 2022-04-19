@@ -22,12 +22,21 @@
    - Далее необходимо добавить настройки сервера в Django проект в файле settings.py
 
 `DATABASES = {
+
     'default': {
+    
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        
         'NAME': 'fabriqueMailingDataBase',  #Имя базы данных
+        
         'USER': 'postgres', #Ваше имя пользователя на сервере PostgreSQL
+        
         'PASSWORD': '123456', #Ваше пароль пользователя на сервере PostgreSQL
+        
         'HOST': '127.0.0.1', 
+        
         'PORT': '5432',
+        
     }
+    
 }`
