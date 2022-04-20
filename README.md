@@ -189,7 +189,7 @@ ____
 
       88: email = EmailMessage('Mailing statistics', someStr.join(str(element)+'\n' for element in varContainer), to=['someMail@yandex.ru'])
 
-Всё почта настроена. Можете перезапускать сервера Celery Beat, Worker, Django и пользоватся всеми возможностями. 
+Всё настроено. Можете перезапускать сервера Celery Beat, Worker, Django и пользоватся всеми возможностями. 
    
 
 ## Дополнительные задания
