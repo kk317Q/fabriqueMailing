@@ -29,7 +29,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'phonenumber_field',
     'rest_framework',
     'drf_yasg',
     'mailingApp',
@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'fabriqueMailing.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
+#Setting up Databse configurations to PostgreSQL server
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -132,6 +132,8 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#Controlling DRF settings
+#Setting renderers for DRF
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES':[
         'rest_framework.renderers.JSONRenderer',
@@ -139,7 +141,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-# celery
+# Celery settings
 CELERY_BROKER_URL = 'redis://localhost:6379' #Заменить по необходимости на актуальный адрес
 CELERY_RESULT_BACKEND = 'redis://localhost:6379' #Заменить по необходимости на актуальный адрес
 CELERY_ACCEPT_CONTENT = ['application/json']  
@@ -147,3 +149,11 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'  
 CELERY_TIMEZONE = 'Europe/Moscow'
 CELERY_ALWAYS_EAGER = True
+
+#Email Settings
+EMAIL_HOST = 'smtp.gmail.com' #Укажите данные под Вашу почту
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'someMail@gmail.com' #Укажите данные под Вашу почту
+EMAIL_HOST_PASSWORD = 'password' #Укажите данные под Вашу почту
+EMAIL_USE_TLS = True
+

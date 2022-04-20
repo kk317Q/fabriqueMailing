@@ -8,7 +8,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-
+#Setting up OpenAPI Swagger page
 schema_view = get_schema_view(
    openapi.Info(
       title="Mailing API",
@@ -22,20 +22,16 @@ schema_view = get_schema_view(
    permission_classes=[permissions.AllowAny],
 )
 
-
+#Setting up routers for APIs based on DRF ViewSets
 router = routers.SimpleRouter()
 router.register(r'client', ClientViewSet)
 router.register(r'mailing', MailingViewSet)
 router.register(r'message', MessageViewSet)
 
-
+#State two general paths:
+#1) One for APIs based on ViewSets specified in router
+#2) Another to access Swagger page for API specification
 urlpatterns = [
     path('api/v1/', include(router.urls)),
-    path(r'api/v1/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-
-    #path(r'api/v1/docs', schema_view),
-    
-
-    #path('api/v1/clients/', ClientViewSet.as_view({'get':'list', 'post':'create'})),
-    #path('api/v1/clients/<int:pk>/', ClientViewSet.as_view({'get':'retrieve', 'put':'update', 'delete':'destroy'})),
+    path(r'api/v1/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]

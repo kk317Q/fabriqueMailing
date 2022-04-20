@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+from phonenumber_field.modelfields import PhoneNumberField
+
 
 # Decalring three classes(Mailing/Client/Message) - database models for mailing App
 
@@ -11,7 +13,7 @@ class Mailing(models.Model):
     targetClient_Tag = models.CharField(max_length = 200)
 
 class Client(models.Model):
-    phoneNumber2 = models.IntegerField(default=0)
+    phoneNumber = PhoneNumberField()#Using specific field to keep phoneNumber in standart E.164 format
     phoneCode2 = models.IntegerField(default=999)
     tag = models.CharField(max_length = 100)
     timeZone = models.IntegerField()
