@@ -93,7 +93,7 @@
      
      conda activate fabriqueEnv
      
-     celery -A fabriqueMailing worker -INFO -n worker1
+     celery -A fabriqueMailing worker -l INFO -n worker1
  
 ### Окно терминала 1
 ##### 9. Последний шаг: Запуск Django сервера в первом окне терминала
