@@ -84,7 +84,7 @@
   
      conda activate fabriqueEnv
   
-     celery -A fabrieMailing beat -l INFO
+     celery -A fabriqueMailing beat -l INFO
   
 ### Окно терминала 4
 ##### 8. Далее в очередном новом окне терминала повторите комнады из 6 пункта, с измененной последней командой для запуска Celery Worker
@@ -93,7 +93,7 @@
      
      conda activate fabriqueEnv
      
-     celery -A fabrieMailing beat -l INFO 
+     celery -A fabriqueMailing beat -l INFO 
  
 ### Окно терминала 1
 ##### 9. Последний шаг: Запуск Django сервера в первом окне терминала
