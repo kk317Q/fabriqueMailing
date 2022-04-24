@@ -10,7 +10,7 @@ from celery.schedules import crontab
 @celery_app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     # Executes every Monday morning at 7:30 a.m.
-    sender.add_periodic_task(10.0, runEmailServise.s(), name='add every 10')
+    sender.add_periodic_task(86400, runEmailServise.s(), name='add every 10')
 
 
     '''sender.add_periodic_task(
@@ -83,7 +83,6 @@ def runEmailServise():
                         "number of Messages Status 400": mailing.message_set.filter(status = '400').count()
                     }
                 )
-            print(someStr.join(str(element)+'\n' for element in varContainer))
 
     email = EmailMessage('Mailing statistics', someStr.join(str(element)+'\n' for element in varContainer), to=['someMAIL@yandex.ru'])
     email.send()

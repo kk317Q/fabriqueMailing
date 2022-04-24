@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Client, Mailing, Message
 
 #Setting up serializers for each Django Model in models.py
+
 class MailingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mailing
